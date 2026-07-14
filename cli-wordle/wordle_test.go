@@ -64,3 +64,13 @@ func TestWordMatch(t *testing.T) {
 	}
 
 }
+
+func TestDictionaryBuilding(t *testing.T) {
+	d := CreateDictionary()
+	if !d["write"] {
+		t.Error("Expected write to be in words")
+	}
+	if d["ffff"] {
+		t.Error("Expected fffff to be not be in words")
+	}
+}
