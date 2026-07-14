@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 )
@@ -14,6 +15,10 @@ const CORRECT = "🟩"
 const HAS = "🟨"
 const DEFAULT = "⬜"
 
+// TODO: Fix the bug/issue where HAS shows up when the
+// correct is already solved.
+// e.g. steaa for steak gives GREENGREENGREENGREENORANGE
+// should be GREENGREENGREENGREENRED
 func GetNotCorrectSquare(c rune, a string) string {
 	for _, aChar := range a {
 		if aChar == c {
@@ -49,13 +54,39 @@ func GetLength(s string) int {
 }
 
 func CleanString(s string) string {
-	return strings.ReplaceAll(s, "\n", "")
+	cleaned := strings.ReplaceAll(s, "\n", "")
+	cleaned = strings.ToLower(cleaned)
+	return cleaned
+}
+
+func CreateDictionary() map[string]bool {
+	dict := map[string]bool{}
+	// 5 letter words
+	file, err := os.Open("./valid_words.txt")
+	if err != nil {
+		log.Fatalf("Failed to open file: %s", err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanWords)
+	for scanner.Scan() {
+		word := scanner.Text()
+		dict[word] = true
+	}
+
+	if err := scanner.Err(); err != nil {
+		log.Fatalf("Error during scanning: %s", err)
+	}
+
+	return dict
 }
 
 func main() {
-	const answer = "write"
+	const answer = "grind"
 	length := GetLength(answer)
 	reader := bufio.NewReader(os.Stdin)
+	dictionary := CreateDictionary()
 
 	attempt := 0
 	fmt.Print("Go Wordle! \n")
@@ -64,10 +95,21 @@ func main() {
 		guess = CleanString(guess)
 		if GetLength(guess) != length {
 			fmt.Printf("Keep the word %d character\n", length)
+		} else if !dictionary[guess] {
+			fmt.Print("Word not found in dictionary\n")
 		} else {
 			fmt.Println(CreateSquareOutput(answer, guess))
+			if guess == answer {
+				break
+			}
 			attempt += 1
 		}
+	}
+
+	if attempt > 6 {
+		fmt.Printf("Didn't get the word")
+	} else {
+		fmt.Printf("Nice")
 	}
 
 }
