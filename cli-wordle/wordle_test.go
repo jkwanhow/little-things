@@ -34,14 +34,14 @@ func TestWordMatch(t *testing.T) {
 	o6 := CORRECT + CORRECT + CORRECT + CORRECT + CORRECT
 
 	if t1 != CORRECT+CORRECT+CORRECT+CORRECT+CORRECT {
-		t.Errorf("Expected %q got %q", HAS, t1)
+		t.Errorf("Expected %q got %q", CORRECT+CORRECT+CORRECT+CORRECT+CORRECT, t1)
 	}
 	if t2 != WRONG+WRONG+WRONG+HAS+WRONG {
-		t.Errorf("Expected %q got %q", WRONG, t2)
+		t.Errorf("Expected %q got %q", WRONG+WRONG+WRONG+HAS+WRONG, t2)
 	}
 
 	if t3 != WRONG+WRONG+WRONG+WRONG+CORRECT {
-		t.Errorf("Expected %q got %q", WRONG, t3)
+		t.Errorf("Expected %q got %q", WRONG+WRONG+WRONG+WRONG+CORRECT, t3)
 	}
 
 	if p1 != o1 {
@@ -63,6 +63,17 @@ func TestWordMatch(t *testing.T) {
 		t.Errorf("Expected %q got %q", o6, p6)
 	}
 
+	steakCase := CreateSquareOutput("steak", "steaa")
+	steakOutput := CORRECT + CORRECT + CORRECT + CORRECT + WRONG
+	if steakCase != steakOutput {
+		t.Errorf("Expected %q got %q", steakOutput, steakCase)
+	}
+	pshawCase := CreateSquareOutput("phsaw", "ahead")
+	pshawOutput := WRONG + CORRECT + WRONG + CORRECT + WRONG
+	if pshawCase != pshawOutput {
+		t.Errorf("Expected %q got %q", pshawOutput, pshawCase)
+	}
+
 }
 
 func TestDictionaryBuilding(t *testing.T) {
@@ -72,5 +83,20 @@ func TestDictionaryBuilding(t *testing.T) {
 	}
 	if d["ffff"] {
 		t.Error("Expected fffff to be not be in words")
+	}
+}
+
+func TestReplaceRuneIndex(t *testing.T) {
+	t1 := ReplaceAtIndex("nice", 'd', 0)
+	if t1 != "dice" {
+		t.Errorf("Expected dice instead got %q", t1)
+	}
+	t2 := ReplaceAtIndex("wowee", 'l', 2)
+	t3 := ReplaceAtIndex(t2, 'a', 1)
+	if t2 != "wolee" {
+		t.Errorf("Expected wolee instead got %q", t2)
+	}
+	if t3 != "walee" {
+		t.Errorf("Expected walee instead got %q", t3)
 	}
 }

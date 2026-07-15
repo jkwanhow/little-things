@@ -15,10 +15,6 @@ const CORRECT = "🟩"
 const HAS = "🟨"
 const DEFAULT = "⬜"
 
-// TODO: Fix the bug/issue where HAS shows up when the
-// correct is already solved.
-// e.g. steaa for steak gives GREENGREENGREENGREENORANGE
-// should be GREENGREENGREENGREENRED
 func GetNotCorrectSquare(c rune, a string) string {
 	for _, aChar := range a {
 		if aChar == c {
@@ -29,20 +25,38 @@ func GetNotCorrectSquare(c rune, a string) string {
 	return WRONG
 }
 
+func ReplaceAtIndex(s string, r rune, i int) string {
+	output := []rune(s)
+	output[i] = r
+	return string(output)
+}
+
 func CreateSquareOutput(a string, g string) string {
 	// remember g and output share the same positioning
 	// in terms of rune/char to square
-	output := ""
+	output := make([]string, len(a))
+
+	workingCopy := []rune(a)
 	for pos, char := range g {
 		if char == rune(a[pos]) {
-			output += CORRECT
+			workingCopy[pos] = '_'
+			output[pos] = CORRECT
 
-		} else {
-			output += GetNotCorrectSquare(char, a)
 		}
 	}
 
-	return output
+	for pos, char := range g {
+		if output[pos] != CORRECT {
+			output[pos] = GetNotCorrectSquare(char, string(workingCopy))
+		}
+	}
+
+	var joinedOutput string
+	for _, char := range output {
+		joinedOutput += char
+	}
+
+	return joinedOutput
 }
 
 func GetLength(s string) int {
@@ -83,7 +97,7 @@ func CreateDictionary() map[string]bool {
 }
 
 func main() {
-	const answer = "grind"
+	const answer = "pshaw"
 	length := GetLength(answer)
 	reader := bufio.NewReader(os.Stdin)
 	dictionary := CreateDictionary()
