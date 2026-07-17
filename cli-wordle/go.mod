@@ -1,4 +1,4 @@
-module little-things/cli-wordle/main
+module jkwanhow/little-things/cli-wordle/main
 
 go 1.25.0
 
