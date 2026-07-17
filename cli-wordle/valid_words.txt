@@ -2683,6 +2683,7 @@ tally
 talon
 tamed
 tamer
+tamps
 tanks
 taper
 tapes
