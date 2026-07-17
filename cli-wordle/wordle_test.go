@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -98,5 +99,17 @@ func TestReplaceRuneIndex(t *testing.T) {
 	}
 	if t3 != "walee" {
 		t.Errorf("Expected walee instead got %q", t3)
+	}
+}
+
+func TestFontMap(t *testing.T) {
+	fontDict := CreateFontMap()
+	a := fontDict["A"]
+	z := fontDict["Z"]
+	for _, line := range a {
+		fmt.Printf("%s\n", line)
+	}
+	for _, line := range z {
+		fmt.Printf("%s\n", line)
 	}
 }
