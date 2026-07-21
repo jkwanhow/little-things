@@ -3,16 +3,27 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 type model struct {
-	cursor         int
-	targetChar     rune
-	targetText     string
+	cursor     int
+	wordCursor int
+	charCursor int
+
+	targetChar  rune
+	targetText  string
+	targetWord  string
+	targetWords []string
+
 	inputChar      rune
 	userTotalInput string
+
+	secondsPassed int
+	secondsGiven  int
+	wordsTyped    int
 }
 
 const (
@@ -63,7 +74,9 @@ func (m model) View() string {
 	if inputPtr > 0 {
 		accuracy = float64(correct) / float64(inputPtr) * 100
 	}
-	s += fmt.Sprintf("Accuracy: %.2f%%", accuracy)
+	timeRemaining := m.secondsGiven - m.secondsPassed
+	s += fmt.Sprintf("Accuracy: %.2f%% | ", accuracy)
+	s += fmt.Sprintf("Seconds remaining: %d", timeRemaining)
 	s += fmt.Sprintf("\n%s\n", string(m.inputChar))
 	return s
 }
@@ -74,11 +87,24 @@ func initialModel() model {
 		userTotalInput: "",
 		targetText:     targetText,
 		cursor:         0,
+		wordCursor:     0,
+		charCursor:     0,
+
+		secondsPassed: 0,
+		secondsGiven:  60,
 	}
 }
 
+type TickMsg time.Time
+
+func doTick() tea.Cmd {
+	return tea.Tick(time.Second, func(t time.Time) tea.Msg {
+		return TickMsg(t)
+	})
+}
+
 func (m model) Init() tea.Cmd {
-	return nil
+	return doTick()
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -101,7 +127,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyCtrlC, tea.KeyEsc:
 			return m, tea.Quit
 		}
-
+	case TickMsg:
+		// every tick perform the following
+		m.secondsPassed++
+		return m, doTick()
 	}
 	return m, nil
 }
